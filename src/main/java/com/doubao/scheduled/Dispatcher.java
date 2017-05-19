@@ -21,7 +21,7 @@ public class Dispatcher {
     /**
      * 定时上传
      */
-    @Scheduled(cron = "0 0 7,17,23 * * ?")
+    @Scheduled(cron = "0 0 7 * * ?")
     public void uploadA(){
         try {
             upload();
