@@ -1,7 +1,6 @@
 package com.doubao.scheduled;
 
 import com.doubao.service.UploadService;
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 @Service
 public class Dispatcher {
@@ -21,7 +25,7 @@ public class Dispatcher {
     /**
      * 定时上传
      */
-    @Scheduled(cron = "0 0 7 * * ?")
+    @Scheduled(cron = "0 0 7 17 * * ?")
     public void uploadA(){
         try {
             upload();
@@ -48,10 +52,16 @@ public class Dispatcher {
     // 5s之后执行
    // @Scheduled(fixedDelay = 100000)
     //@Scheduled(cron = "0 0/1 * * * ?")
-    public void upload() throws Exception {
+    public void upload(){
         log.info("run");
+        Calendar calendar =  Calendar.getInstance();
+      /*
+        calendar.add(Calendar.DATE,-1);
+        String date = DateFormatUtils.format(calendar.getTimeInMillis(),DateFormatUtils.ISO_DATE_FORMAT.getPattern());
+       */
 
-        String date = DateFormatUtils.format(System.currentTimeMillis(),DateFormatUtils.ISO_DATE_FORMAT.getPattern());
+        SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
+
         // 用户根目录
         String rootFile = System.getProperties().getProperty("user.home");
         String down= "Downloads";
@@ -78,10 +88,24 @@ public class Dispatcher {
                              File f = fis[j];
                              if(null != f){
                                  log.info("f["+f.getAbsolutePath()+"]");
-                                 if(f.getName().equals(date)){
-                                     uploadService.upload(f);
-                                 }else {
-                                     log.info(f.getName()+"!="+date);
+                                 Date da;
+                                 try {
+                                     da = formatter.parse(f.getName());
+                                     calendar.setTime(da);
+
+                                     if(Calendar.getInstance().after(calendar)){
+                                         log.info(f.getName()+"上传");
+                                         try {
+                                             uploadService.upload(f);
+                                         } catch (IOException e) {
+                                            log.error("",e);
+                                         }
+                                     }else {
+                                         log.info(f.getName()+"不上传");
+                                     }
+
+                                 } catch (ParseException e) {
+                                     log.error("",e);
                                  }
                              }
 

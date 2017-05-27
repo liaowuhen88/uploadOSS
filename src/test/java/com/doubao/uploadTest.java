@@ -13,6 +13,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by liaowuhen on 2017/5/18.
@@ -48,6 +52,36 @@ public class uploadTest {
         uploadService.upload(file);
 
     }
+
+    @Test
+    public void time() throws ParseException {
+        Calendar calendar =  Calendar.getInstance();
+        /*calendar.add(Calendar.DATE,1);
+        String date = DateFormatUtils.format(calendar.getTimeInMillis(),DateFormatUtils.ISO_DATE_FORMAT.getPattern());
+*/
+        SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
+        Date da = formatter.parse("2017-05-27");
+
+        calendar.setTime(da);
+
+
+        boolean flag = Calendar.getInstance().after(calendar);
+
+        System.out.print("date"+flag);
+
+        da = formatter.parse("2017-05-26");
+
+        calendar.setTime(da);
+
+
+        flag = Calendar.getInstance().after(calendar);
+
+
+        System.out.print("date"+flag);
+
+    }
+
+
 
 
 }
