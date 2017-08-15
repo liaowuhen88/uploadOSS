@@ -25,7 +25,7 @@ public class Dispatcher {
     /**
      * 定时上传
      */
-    @Scheduled(cron = "0 0 7 17 * * ?")
+    @Scheduled(cron = "0 0 7,17 * * ?")
     public void uploadA(){
         try {
             upload();
@@ -84,32 +84,35 @@ public class Dispatcher {
                          log.info("fi["+fi.getAbsolutePath()+"]");
                          File[] fis = fi.listFiles();
 
-                         for(int j=0;j<fis.length;j++){
-                             File f = fis[j];
-                             if(null != f){
-                                 log.info("f["+f.getAbsolutePath()+"]");
-                                 Date da;
-                                 try {
-                                     da = formatter.parse(f.getName());
-                                     calendar.setTime(da);
+                         if(null != fis){
+                             for(int j=0;j<fis.length;j++){
+                                 File f = fis[j];
+                                 if(null != f){
+                                     log.info("f["+f.getAbsolutePath()+"]");
+                                     Date da;
+                                     try {
+                                         da = formatter.parse(f.getName());
+                                         calendar.setTime(da);
 
-                                     if(Calendar.getInstance().after(calendar)){
-                                         log.info(f.getName()+"上传");
-                                         try {
-                                             uploadService.upload(f);
-                                         } catch (IOException e) {
-                                            log.error("",e);
+                                         if(Calendar.getInstance().after(calendar)){
+                                             log.info(f.getName()+"上传");
+                                             try {
+                                                 uploadService.upload(f);
+                                             } catch (IOException e) {
+                                                 log.error("",e);
+                                             }
+                                         }else {
+                                             log.info(f.getName()+"不上传");
                                          }
-                                     }else {
-                                         log.info(f.getName()+"不上传");
+
+                                     } catch (ParseException e) {
+                                         log.error("",e);
                                      }
-
-                                 } catch (ParseException e) {
-                                     log.error("",e);
                                  }
-                             }
 
+                             }
                          }
+
                      }
 
 
